@@ -1,52 +1,88 @@
 #include <NewPing.h>
 
-#define LEFT_TRIGGER_PIN  12  
-#define LEFT_ECHO_PIN     11  
-#define LEFT_LED_PIN      10
+#define TRIGGER_PIN_SENSOR_0  12  
+#define ECHO_PIN_SENSOR_0     11  
+#define LED_PIN_SENSOR_0      10
 
-#define RIGHT_TRIGGER_PIN  3  
-#define RIGHT_ECHO_PIN     4  
-#define RIGHT_LED_PIN      2
+#define TRIGGER_PIN_SENSOR_1  3  
+#define ECHO_PIN_SENSOR_1     4  
+#define LED_PIN_SENSOR_1      2
 
 #define MAX_DISTANCE 200
 #define SONAR_NUM 2
 
 int min_dist = 2;
 int max_dist = 20;
+int default_sensor = 999;
+int active_sensor = default_sensor;
+int next_sensor = default_sensor;
+
 NewPing sonar[SONAR_NUM] = {   // Sensor object array.
-  NewPing(LEFT_TRIGGER_PIN, LEFT_ECHO_PIN, MAX_DISTANCE), // Each sensor's trigger pin, echo pin, and max distance to ping. 
-  NewPing(RIGHT_TRIGGER_PIN, RIGHT_ECHO_PIN, MAX_DISTANCE), 
+  NewPing(TRIGGER_PIN_SENSOR_0, ECHO_PIN_SENSOR_0, MAX_DISTANCE), // Each sensor's trigger pin, echo pin, and max distance to ping. 
+  NewPing(TRIGGER_PIN_SENSOR_1, ECHO_PIN_SENSOR_1, MAX_DISTANCE), 
 };
 
 void setup() {
-  pinMode(LEFT_LED_PIN, OUTPUT);
-  pinMode(RIGHT_LED_PIN, OUTPUT);
+  pinMode(LED_PIN_SENSOR_0, OUTPUT);
+  pinMode(LED_PIN_SENSOR_1, OUTPUT);
   Serial.begin(115200);
-  digitalWrite(LEFT_LED_PIN, HIGH);
-  digitalWrite(RIGHT_LED_PIN, LOW);
+  active_sensor = 0;
+  startLedLeft();
 }
 
 void loop() {
-  delay(50); // 29ms should be the shortest delay between pings.
+  delay(50); // 29ms should be the shortest delay between pings
+
   for (uint8_t i = 0; i < SONAR_NUM; i++) {
-    checkContact(sonar[i].ping_cm(), i);
+    if (active_sensor == i){
+      checkContact(sonar[i].ping_cm(), i);
+  }
+    
   }
 }
 
 void checkContact(int dist, int sensor){
-  if (dist > min_dist && dist < max_dist){
-    Serial.print("Ping: ");
-    Serial.print(dist);
-    Serial.println("cm");
-    if (sensor == 0){
-      digitalWrite(RIGHT_LED_PIN, HIGH);
-      digitalWrite(LEFT_LED_PIN, LOW);
-    }
-    else if (sensor == 1){
-      digitalWrite(LEFT_LED_PIN, HIGH);
-      digitalWrite(RIGHT_LED_PIN, LOW);
-    }
+  if (dist >= min_dist && dist <= max_dist){
+    printDist(dist);
+    turnOffLeds();
+    delay(2000);
+    startRandomLed();
   }
+}
+
+void startLedLeft(){
+  digitalWrite(LED_PIN_SENSOR_0, HIGH);
+  digitalWrite(LED_PIN_SENSOR_1, LOW);
+}
+
+void startLedRight(){
+  digitalWrite(LED_PIN_SENSOR_0, LOW);
+  digitalWrite(LED_PIN_SENSOR_1, HIGH);
+}
+
+void startRandomLed(){
+  next_sensor = random(SONAR_NUM);
+  Serial.print("Random number: ");
+  Serial.print(next_sensor);
+  if (next_sensor == 0){
+      startLedLeft();
+    }
+  else if (next_sensor == 1){
+      startLedRight();
+    }
+  active_sensor = next_sensor;
+  next_sensor = default_sensor;
+}
+
+void turnOffLeds(){
+  digitalWrite(LED_PIN_SENSOR_0, LOW);
+  digitalWrite(LED_PIN_SENSOR_1, LOW);
+}
+
+void printDist(int dist){
+  Serial.print("Ping: ");
+  Serial.print(dist);
+  Serial.println("cm");
 }
 
 // TODO
@@ -54,5 +90,5 @@ void checkContact(int dist, int sensor){
 // [X] make led light
 // [x] Toggle led with two sensors
 // [X] light up one led, turn off with sensor
-// [] light up random led, turn off with sensor
+// [x] light up random led, turn off with sensor
 // [] light up random led within a random time, turn of with sensor
