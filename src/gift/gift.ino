@@ -22,6 +22,8 @@ void setup() {
   pinMode(LEFT_LED_PIN, OUTPUT);
   pinMode(RIGHT_LED_PIN, OUTPUT);
   Serial.begin(115200);
+  digitalWrite(LEFT_LED_PIN, HIGH);
+  digitalWrite(RIGHT_LED_PIN, LOW);
 }
 
 void loop() {
@@ -37,12 +39,12 @@ void checkContact(int dist, int sensor){
     Serial.print(dist);
     Serial.println("cm");
     if (sensor == 0){
-      digitalWrite(LEFT_LED_PIN, HIGH);
-      digitalWrite(RIGHT_LED_PIN, LOW);
-    }
-    else if (sensor == 1){
       digitalWrite(RIGHT_LED_PIN, HIGH);
       digitalWrite(LEFT_LED_PIN, LOW);
+    }
+    else if (sensor == 1){
+      digitalWrite(LEFT_LED_PIN, HIGH);
+      digitalWrite(RIGHT_LED_PIN, LOW);
     }
   }
 }
@@ -51,6 +53,6 @@ void checkContact(int dist, int sensor){
 // [X] input from sensor
 // [X] make led light
 // [x] Toggle led with two sensors
-// [] light up one led, turn off with sensor
+// [X] light up one led, turn off with sensor
 // [] light up random led, turn off with sensor
 // [] light up random led within a random time, turn of with sensor
