@@ -14,7 +14,8 @@ int max_dist = 20;
 int default_sensor = 999;
 int active_sensor = default_sensor;
 int next_sensor = default_sensor;
-int sleep = 2000;
+int min_sleep = 2000;
+int max_sleep = 5000;
 
 NewPing sonar[SONAR_NUM] = {   // Sensor object array.
   NewPing(PIN_SENSOR_0, PIN_SENSOR_0, MAX_DISTANCE), // Each sensor's trigger pin, echo pin, and max distance to ping. 
@@ -42,7 +43,7 @@ void checkContact(int dist, int sensor){
   if (dist >= min_dist && dist <= max_dist){
     printDist(dist);
     turnOffLeds();
-    delay(sleep);
+    delay(random(min_sleep, max_sleep));
     startRandomLed();
   }
 }
@@ -88,4 +89,4 @@ void printDist(int dist){
 // [x] Toggle led with two sensors
 // [X] light up one led, turn off with sensor
 // [x] light up random led, turn off with sensor
-// [] light up random led within a random time, turn of with sensor
+// [x] light up random led within a random time, turn of with sensor
