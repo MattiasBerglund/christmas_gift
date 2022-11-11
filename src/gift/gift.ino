@@ -16,6 +16,7 @@ int max_dist = 20;
 int default_sensor = 999;
 int active_sensor = default_sensor;
 int next_sensor = default_sensor;
+int sleep = 2000;
 
 NewPing sonar[SONAR_NUM] = {   // Sensor object array.
   NewPing(TRIGGER_PIN_SENSOR_0, ECHO_PIN_SENSOR_0, MAX_DISTANCE), // Each sensor's trigger pin, echo pin, and max distance to ping. 
@@ -26,8 +27,7 @@ void setup() {
   pinMode(LED_PIN_SENSOR_0, OUTPUT);
   pinMode(LED_PIN_SENSOR_1, OUTPUT);
   Serial.begin(115200);
-  active_sensor = 0;
-  startLedLeft();
+  startRandomLed();
 }
 
 void loop() {
@@ -36,8 +36,7 @@ void loop() {
   for (uint8_t i = 0; i < SONAR_NUM; i++) {
     if (active_sensor == i){
       checkContact(sonar[i].ping_cm(), i);
-  }
-    
+    }
   }
 }
 
@@ -45,17 +44,17 @@ void checkContact(int dist, int sensor){
   if (dist >= min_dist && dist <= max_dist){
     printDist(dist);
     turnOffLeds();
-    delay(2000);
+    delay(sleep);
     startRandomLed();
   }
 }
 
-void startLedLeft(){
+void startLedSensor0(){
   digitalWrite(LED_PIN_SENSOR_0, HIGH);
   digitalWrite(LED_PIN_SENSOR_1, LOW);
 }
 
-void startLedRight(){
+void startLedSensor1(){
   digitalWrite(LED_PIN_SENSOR_0, LOW);
   digitalWrite(LED_PIN_SENSOR_1, HIGH);
 }
@@ -65,10 +64,10 @@ void startRandomLed(){
   Serial.print("Random number: ");
   Serial.print(next_sensor);
   if (next_sensor == 0){
-      startLedLeft();
+      startLedSensor0();
     }
   else if (next_sensor == 1){
-      startLedRight();
+      startLedSensor1();
     }
   active_sensor = next_sensor;
   next_sensor = default_sensor;
