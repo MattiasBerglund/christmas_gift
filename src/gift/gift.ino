@@ -1,15 +1,13 @@
 #include <NewPing.h>
 
-#define TRIGGER_PIN_SENSOR_0  12  
-#define ECHO_PIN_SENSOR_0     11  
-#define LED_PIN_SENSOR_0      10
+#define PIN_SENSOR_0  12  
+#define LED_SENSOR_0  10
 
-#define TRIGGER_PIN_SENSOR_1  3  
-#define ECHO_PIN_SENSOR_1     4  
-#define LED_PIN_SENSOR_1      2
+#define PIN_SENSOR_1  3  
+#define LED_SENSOR_1  2
 
-#define MAX_DISTANCE 200
-#define SONAR_NUM 2
+#define MAX_DISTANCE  200
+#define SONAR_NUM     2
 
 int min_dist = 2;
 int max_dist = 20;
@@ -19,13 +17,13 @@ int next_sensor = default_sensor;
 int sleep = 2000;
 
 NewPing sonar[SONAR_NUM] = {   // Sensor object array.
-  NewPing(TRIGGER_PIN_SENSOR_0, ECHO_PIN_SENSOR_0, MAX_DISTANCE), // Each sensor's trigger pin, echo pin, and max distance to ping. 
-  NewPing(TRIGGER_PIN_SENSOR_1, ECHO_PIN_SENSOR_1, MAX_DISTANCE), 
+  NewPing(PIN_SENSOR_0, PIN_SENSOR_0, MAX_DISTANCE), // Each sensor's trigger pin, echo pin, and max distance to ping. 
+  NewPing(PIN_SENSOR_1, PIN_SENSOR_1, MAX_DISTANCE), 
 };
 
 void setup() {
-  pinMode(LED_PIN_SENSOR_0, OUTPUT);
-  pinMode(LED_PIN_SENSOR_1, OUTPUT);
+  pinMode(LED_SENSOR_0, OUTPUT);
+  pinMode(LED_SENSOR_1, OUTPUT);
   Serial.begin(115200);
   startRandomLed();
 }
@@ -50,13 +48,13 @@ void checkContact(int dist, int sensor){
 }
 
 void startLedSensor0(){
-  digitalWrite(LED_PIN_SENSOR_0, HIGH);
-  digitalWrite(LED_PIN_SENSOR_1, LOW);
+  digitalWrite(LED_SENSOR_0, HIGH);
+  digitalWrite(LED_SENSOR_1, LOW);
 }
 
 void startLedSensor1(){
-  digitalWrite(LED_PIN_SENSOR_0, LOW);
-  digitalWrite(LED_PIN_SENSOR_1, HIGH);
+  digitalWrite(LED_SENSOR_0, LOW);
+  digitalWrite(LED_SENSOR_1, HIGH);
 }
 
 void startRandomLed(){
@@ -74,8 +72,8 @@ void startRandomLed(){
 }
 
 void turnOffLeds(){
-  digitalWrite(LED_PIN_SENSOR_0, LOW);
-  digitalWrite(LED_PIN_SENSOR_1, LOW);
+  digitalWrite(LED_SENSOR_0, LOW);
+  digitalWrite(LED_SENSOR_1, LOW);
 }
 
 void printDist(int dist){
