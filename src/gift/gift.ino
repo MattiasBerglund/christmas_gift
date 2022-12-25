@@ -23,6 +23,7 @@
 int min_dist = 2;
 int max_dist = 20;
 int rounds = 10;
+int times[10];
 int min_sleep = 0;
 int max_sleep = 0;
 
@@ -31,6 +32,9 @@ int played_rounds = 1;
 int default_sensor = 999;
 int active_sensor = default_sensor;
 int next_sensor = default_sensor;
+int start_time = 0;
+int stop_time = 0;
+int start_round_time = 0;
 
 
 NewPing sonar[SONAR_NUM] = {   // Sensor object array.
@@ -54,7 +58,6 @@ void setup() {
 
 void loop() {
   delay(50); // 29ms should be the shortest delay between pings
-
   for (uint8_t i = 0; i < SONAR_NUM; i++) {
     if (active_sensor == i){
       checkContact(sonar[i].ping_cm(), i);
@@ -81,12 +84,32 @@ void startSession(){
   delay(1000);
   turnOffLeds();
   delay(1000);
+  start_time = millis();
   startRandomLed();
 }
 
 void stopSession(){
+  stop_time = millis();
   startAllLeds();
   delay(3000);
+
+  Serial.println("******* RESULT *******");
+  Serial.print("Total Time: ");
+  Serial.print(stop_time - start_time);
+  Serial.println(" ms");
+
+  for (uint8_t i = 0; i < rounds; i++) {
+    Serial.print("Round ");
+    Serial.print(i + 1);
+    Serial.print(" Time: ");
+    Serial.print(times[i]);
+    Serial.println(" ms");    
+  }
+
+  Serial.println("**********************");
+
+
+
   startSession();
 }
 
@@ -99,6 +122,8 @@ bool checkDist(int dist){
 }
 void checkContact(int dist, int sensor){
   if (checkDist(dist)){
+    times[played_rounds - 1] = millis() - start_round_time;
+
     if (played_rounds == rounds){
       stopSession();
     }
@@ -191,8 +216,8 @@ void startRandomLed(){
       startLedSensor4();
     }
   active_sensor = next_sensor;
-  // next_sensor = default_sensor;
-}
+  start_round_time = millis();
+  }
 
 void turnOffLeds(){
   digitalWrite(LED_SENSOR_0, LOW);
@@ -208,3 +233,8 @@ void printDist(int dist){
   Serial.print(dist);
   Serial.println("cm");
 }
+
+// TODO:
+// [] Add mean time
+// [] Print which module connects to which time
+// [] Look over random function. Start is simliar most of the times...
