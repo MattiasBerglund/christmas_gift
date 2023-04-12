@@ -24,6 +24,9 @@
 #define MINIMUM_DISTANCE 2     // cm
 #define MAXIMUM_OFF_TIME 0     // ms
 #define MINIMUM_OFF_TIME 0     // ms
+#define BIRTHDAY_GAME    true
+#define MIN_GAME_TIME   5000   // ms
+#define MAX_GAME_TIME   30000   // ms
 #define USE_MY_ORDER     false
 int my_order[MAXIMUM_ROUNDS] = {1,5}; // Choose between sensor nr 1-5. e.g. {1,2,3,4,5,5,4,3,2,1} 
 
@@ -36,6 +39,10 @@ int start_round_time = 0;
 int times[MAXIMUM_ROUNDS];
 int sensors[MAXIMUM_ROUNDS];
 int rounds = 0;
+int startTime = 0;
+int randomTime = 0;
+int currentTime = 0;
+int randomStuff = 0;
 
 
 NewPing sonar[NR_OF_SENSOR] = {
@@ -61,7 +68,7 @@ void setup() {
 void loop() {
   delay(50);
   for (uint8_t i = 0; i < NR_OF_SENSOR; i++) {
-    if (active_sensor == i){
+    if (active_sensor == i || BIRTHDAY_GAME == true){
       checkContact(sonar[i].ping_cm(), i);
     }
   }
@@ -69,19 +76,35 @@ void loop() {
 
 void checkContact(int dist, int sensor){
   if (checkDist(dist)){
-    times[played_rounds - 1] = millis() - start_round_time;
-    sensors[played_rounds - 1] = active_sensor + 1;
-
-    if (played_rounds == rounds){
-      stopSession();
+    if (BIRTHDAY_GAME == true){
+      startLedSensor(sensor);
+      endGame();
     }
-    else {
-      turnOffLeds();
-      delay(random(MINIMUM_OFF_TIME, MAXIMUM_OFF_TIME));
-      played_rounds = played_rounds + 1;
-      startNextLed();
-    }    
+    else{
+      normalGame();
+    }
   }
+}
+
+void endGame(){
+  while (true){
+
+  }
+}
+
+void normalGame(){
+  times[played_rounds - 1] = millis() - start_round_time;
+  sensors[played_rounds - 1] = active_sensor + 1;
+
+  if (played_rounds == rounds){
+    stopSession();
+  }
+  else {
+    turnOffLeds();
+    delay(random(MINIMUM_OFF_TIME, MAXIMUM_OFF_TIME));
+    played_rounds = played_rounds + 1;
+    startNextLed();
+  }    
 }
 
 void startSession(){
@@ -91,8 +114,28 @@ void startSession(){
   startLedSensorStart();
   waitForStart();
   startLight();
-  start_time = millis();
-  startNextLed();
+  if (BIRTHDAY_GAME == true){
+    startGame();
+  }
+  else{
+    start_time = millis();
+    startNextLed();
+  }
+}
+
+void startGame(){
+  startAllLeds();
+  randomStuff = random(MIN_GAME_TIME, MAX_GAME_TIME);
+  randomTime = abs(randomStuff);
+  startTime = millis();
+  currentTime = millis() - startTime;
+  printTotalTime(randomTime);
+
+  while (currentTime < randomTime){
+    // printMeanTime(currentTime);
+    currentTime = millis() - startTime;
+  }
+  turnOffLeds();
 }
 
 void waitForStart(){
@@ -270,6 +313,7 @@ void printTotalTime(int total_time){
 
 void printMeanTime(int total_time){
   Serial.print("Mean Time: ");
-  Serial.print(total_time / rounds);
+  // Serial.print(total_time / rounds);
+  Serial.print(total_time);
   Serial.println(" ms");
 }
